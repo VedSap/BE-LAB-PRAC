@@ -1,0 +1,221 @@
+def fib(n):
+	if n <= 1:
+		return n
+	return fib(n-1) + fib(n-2)
+
+======================================================================================================================================================================================
+
+def frac(val,wt,cap):
+	ratio = [(val[i]/wt[i],val[i],wt[i])for i in range(len(value))]
+	ratio.sort(reverse=True)
+	tot = 0
+	for r ,v ,w in ratio:
+		if cap >= w:
+			cap -= w
+			tot+=v
+		else:
+			tot += r*cap
+			break
+	return tot
+
+======================================================================================================================================================================================
+
+def knap(wt,val,cap,n):
+	if n == 0 or cap == 0:
+		return 0
+	if wt[n-1] <= cap:
+		return max(val[n-1]+knap(wt, val, cap - wt[n-1],n-1), knap(wt,val,cap,n-1))
+	else:
+		return knap(wt,val,cap,n-1)
+
+======================================================================================================================================================================================
+
+def job_scheduling(jobs):
+    jobs.sort(key=lambda x: x[1], reverse=True)
+    max_deadline = max(job[2] for job in jobs)
+    slots = [-1] * (max_deadline + 1)
+    total_profit = 0
+    job_sequence = []
+    for job in jobs:
+        job_id, profit, deadline = job
+        for d in range(deadline, 0, -1):
+            if slots[d] == -1:
+                slots[d] = job_id
+                total_profit += profit
+                job_sequence.append(job_id)
+                break
+    return job_sequence, total_profit
+
+sequence, profit = job_scheduling(jobs)
+
+======================================================================================================================================================================================			
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegesor
+from sklearn.metrics import r2_score, mean_squared_error
+df = pd.read_csv("UBER.csv").dropna()
+df.head()
+for c in ['fare_amount' , 'dist']:
+	q1,q3 = df[c].quantile([0.25,0.75])
+	iqr = q3-q1
+	df = df[(df[c]>q1-1.5*iqr)&(df[c]<q3+1.5*iqr)]
+print(df[['fare_amount','passenger_count','dist']].corr())
+x = df[['passenger_count','dist']];
+y = df['fare_amount']
+xtr,xts,ytr,yts = train_test_split(x,y,test_size=0.2,random_state=1)
+sc = StandardScaler();
+xtr = sc.fit_transform(xtr)
+xts = sc.transform(xt)
+for name,model in [('LR',LinearRegression()),('RF',RandomForestRegressor(n_estimators = 50, random_state = 1))]:
+	model.fit(xtr,ytr)
+	p = model.predict(xts)
+	print(name,"r2",r2_score(yts,p),"mse",mean_squared_error(yts,p,squared=False))
+	plt.scatter(x,y,color="blue",label='ActualData')
+	plt.plot([yts.min(),yts.max()],[yts.min(),yts.max()], color = ("red" if name == "LR" else "green"), linewidth =2, label = name + 'Fit line')
+
+======================================================================================================================================================================================
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report
+df = pd.read_csv("emails.csv")
+df.head()
+df.info()
+xtr,xts,ytr,yts = train_test_split(df.text,df.label,test_size = 0.2,random_state = 1)
+v = TfidfVectorizer(stop_word = 'english', max_features = 5000)
+xtr = v.fit_transform(xtr)
+xts = v.transform(xts)
+for name,cls in [("KNN",KNeighborsClassifier()),('SVM',SVC(kernel='linear'))]:
+	clf.fit(xtr,ytr)
+	p=clf.predict(xts)
+	print(name)
+	print(classification_report(yts,p))
+
+======================================================================================================================================================================================
+
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoding
+from sklearn.metrics import confusion_matrix,accuracy_score
+from tensorflow.neural_network import MLPClassifier
+df = pd.read_csv("Bank.csv")
+x=df.drop(["RowNumber","CustomerID","Surname","Exited"],axis=1)
+y =df.Exited
+x=pd.get_dummies(x,drop_first=True)
+xtr,xts,ytr,yts = train_test_split(x,y,test_size=0.2,random_state=1)
+sc = StandardScaler()
+xtr = sc.fit_transform(xtr)
+xte = sc.transform(xts)
+m = MLPClassifier(hidden_layer_sizes=(16, 8), activation='relu',
+ solver='adam', max_iter=200, random_state=42)
+m.fit(xtr, ytr)
+p=m.predict(xts)
+print("ConfusionMatrix\n",confusion_matrix(yte,p))
+print("Accuracy=",accuracy_score(yts,p))
+
+======================================================================================================================================================================================
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix,accuracy_score,precison_score,recall_score
+df = pd.read_csv("diabetes.csv").dropna()
+df.info
+x=df.drop('Outcome',axis=1)
+y=df.Outcome
+xtr,xts,ytr,yts=train_test_split(x,y,test_size=0.2,random_state=1)
+clf = KNeighborsClassifier(n_neighbors=5)
+clf.fit(xtr,ytr)
+p=clf.predict(xts)
+print("ConfusionMatrix\n",confusion_matrix(yte,p))
+print("Accuracy=",accuracy_score(yts,p),"Error=",1-accuracy_score(yts,p))
+print("Precision=",precison_score(yts,p),"Recall",recall_score(yts,p))
+
+======================================================================================================================================================================================
+
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as  plt
+df=pd.read_csv("sale_data.csv")
+df.ORDERDATE = pd.to_datetime(df.ORDERDATE)
+daily=df.groupby(df.ORDERDATE.dt.date).SALES.sum().reset_index()
+x=daily.SALES.values.reshape(-1,1)
+inertia=[]
+k=range(1,8)
+for k in K:
+	inertia.append(KMeans(k,random_state=1).fit(X).inertia_)
+plt.plot(K,inertia,'-o')
+plt.xlabel('k')
+plt.ylabel('inertia')
+plt.show()
+k=3
+km=KMeans(k,random_state=1).fit(x)
+daily['cluster']=km.labels_
+print(daily.head)
+
+======================================================================================================================================================================================
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+contract Bank {
+    mapping(address=>uint) balances;
+    event Deposit(address indexed who,uint amount);
+    event Withdraw(address indexed who,uint amount);
+
+    function deposit() external payable {
+        require(msg.value>0,"zero");
+        balances[msg.sender]+=msg.value;
+        emit Deposit(msg.sender,msg.value);
+    }
+    function withdraw(uint amt) external {
+        require(balances[msg.sender]>=amt,"insuff");
+        balances[msg.sender]-=amt;
+        payable(msg.sender).transfer(amt);
+        emit Withdraw(msg.sender,amt);
+    }
+    function getBalance() external view returns(uint){ return balances[msg.sender]; }
+}
+
+======================================================================================================================================================================================
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+contract Students {
+    struct Student { uint id; string name; uint8 grade; }
+    Student[] public students;
+    event Added(uint id,string name);
+
+    function add(uint _id,string calldata _name,uint8 _g) external {
+        students.push(Student(_id,_name,_g));
+        emit Added(_id,_name);
+    }
+    function get(uint i) external view returns(Student memory){ return students[i]; }
+
+    // fallback and receive to accept ETH
+    receive() external payable {}
+    fallback() external payable {}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
