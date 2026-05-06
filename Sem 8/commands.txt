@@ -1,0 +1,22 @@
+----------FOR OPENMP-----------------------------
+sudo apt update
+sudo apt install g++
+g++ test.cpp -o test //for normal cpp
+g++ test.cpp -fopenmp -o test //for OpenMP
+./test
+
+----------FOR CUDA-------------------------------
+nvidia-smi
+sudo apt install nvidia-cuda-toolkit
+nvcc --version
+nvcc test.cu -o test
+./test
+
+
+-----------FOR DLL-------------------------------
+xdg-open https://colab.research.google.com
+or
+google-chrome https://colab.research.google.com
+or
+pip install notebook
+jupyter notebook
