@@ -1,19 +1,31 @@
-// CUDA Large Vector Addition
 #include<stdio.h>
+
 __global__ void add(int*a,int*b,int*c){
     int i=threadIdx.x;
     c[i]=a[i]+b[i];
 }
+
 int main(){
-    int a[]={1,2,3,4,5},b[]={5,4,3,2,1},c[5],*x,*y,*z;
-    cudaMalloc(&x,20); cudaMalloc(&y,20); cudaMalloc(&z,20);
+    int n;
+    scanf("%d",&n);
 
-    cudaMemcpy(x,a,20,cudaMemcpyHostToDevice);
-    cudaMemcpy(y,b,20,cudaMemcpyHostToDevice);
+    int a[n],b[n],c[n];
 
-    add<<<1,5>>>(x,y,z);
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+    for(int i=0;i<n;i++) scanf("%d",&b[i]);
 
-    cudaMemcpy(c,z,20,cudaMemcpyDeviceToHost);
+    int *x,*y,*z;
 
-    for(int i:c) printf("%d ",i);
+    cudaMalloc(&x,n*4);
+    cudaMalloc(&y,n*4);
+    cudaMalloc(&z,n*4);
+
+    cudaMemcpy(x,a,n*4,cudaMemcpyHostToDevice);
+    cudaMemcpy(y,b,n*4,cudaMemcpyHostToDevice);
+
+    add<<<1,n>>>(x,y,z);
+
+    cudaMemcpy(c,z,n*4,cudaMemcpyDeviceToHost);
+
+    for(int i=0;i<n;i++) printf("%d ",c[i]);
 }
